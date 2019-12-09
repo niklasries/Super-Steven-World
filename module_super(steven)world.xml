@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_super(steven)world" default="compile.module.super(steven)world">
+  <dirname property="module.super(steven)world.basedir" file="${ant.file.module_super(steven)world}"/>
+  
+  <property name="module.jdk.home.super(steven)world" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.super(steven)world" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.super(steven)world" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.super(steven)world" value="-encoding UTF-8 -source 11 -target 11 ${compiler.args}"/>
+  
+  <property name="super(steven)world.output.dir" value="${module.super(steven)world.basedir}/out/production/Super(Steven)World"/>
+  <property name="super(steven)world.testoutput.dir" value="${module.super(steven)world.basedir}/out/test/Super(Steven)World"/>
+  
+  <path id="super(steven)world.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="super(steven)world.module.production.classpath">
+    <path refid="${module.jdk.classpath.super(steven)world}"/>
+    <fileset dir="${basedir}/../OGLtest/lwjgl">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${path.variable.maven_repository}/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar"/>
+  </path>
+  
+  <path id="super(steven)world.runtime.production.module.classpath">
+    <pathelement location="${super(steven)world.output.dir}"/>
+    <fileset dir="${basedir}/../OGLtest/lwjgl">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${path.variable.maven_repository}/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar"/>
+  </path>
+  
+  <path id="super(steven)world.module.classpath">
+    <path refid="${module.jdk.classpath.super(steven)world}"/>
+    <pathelement location="${super(steven)world.output.dir}"/>
+    <fileset dir="${basedir}/../OGLtest/lwjgl">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${path.variable.maven_repository}/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar"/>
+  </path>
+  
+  <path id="super(steven)world.runtime.module.classpath">
+    <pathelement location="${super(steven)world.testoutput.dir}"/>
+    <pathelement location="${super(steven)world.output.dir}"/>
+    <fileset dir="${basedir}/../OGLtest/lwjgl">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${path.variable.maven_repository}/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.super(steven)world">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.super(steven)world">
+    <patternset refid="excluded.from.module.super(steven)world"/>
+  </patternset>
+  
+  <path id="super(steven)world.module.sourcepath">
+    <dirset dir="${module.super(steven)world.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.super(steven)world" depends="compile.module.super(steven)world.production,compile.module.super(steven)world.tests" description="Compile module Super(Steven)World"/>
+  
+  <target name="compile.module.super(steven)world.production" depends="register.custom.compilers" description="Compile module Super(Steven)World; production classes">
+    <mkdir dir="${super(steven)world.output.dir}"/>
+    <javac2 destdir="${super(steven)world.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.super(steven)world}/javac">
+      <compilerarg line="${compiler.args.super(steven)world}"/>
+      <bootclasspath refid="super(steven)world.module.bootclasspath"/>
+      <classpath refid="super(steven)world.module.production.classpath"/>
+      <src refid="super(steven)world.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.super(steven)world"/>
+    </javac2>
+    
+    <copy todir="${super(steven)world.output.dir}">
+      <fileset dir="${module.super(steven)world.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.super(steven)world.tests" depends="register.custom.compilers,compile.module.super(steven)world.production" description="compile module Super(Steven)World; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.super(steven)world" description="cleanup module">
+    <delete dir="${super(steven)world.output.dir}"/>
+    <delete dir="${super(steven)world.testoutput.dir}"/>
+  </target>
+</project>

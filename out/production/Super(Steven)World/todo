@@ -1,0 +1,11 @@
+#todo list for the simple pixel engine
+
+#todo should be done first
+-Extend texture atlas to an "animation" class where in it cycles with an animation speed of frames to update through a range in the texture atlas or an subimage/subatlas
+-implement a playercontrol map where gl Keycallbacks only change the state ond then are incorperated into rendering so movemtn happens as long as a thing is pressed and multiple buttons can be pressed at once
+-implement a camera class that moves the renderd screenspace according to the player position
+
+#todo very optional atm
+-implement glsl shader support for 2d shaders
+-implement sound?
+-implement mouse interactions ?
