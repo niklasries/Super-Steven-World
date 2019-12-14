@@ -9,6 +9,9 @@ public class Control {
     HashMap hm = new HashMap();
     boolean runnin=true;
     public Thread controler;
+    public static int speed=1;
+    int previousAnimstate=0;
+    boolean casted=false;
     public Control(long window1,MainWindow mainWindow){
 
         System.out.println("Init Controls");
@@ -41,6 +44,41 @@ public class Control {
         controler.start();
 
 
+        glfwSetMouseButtonCallback(window,(window,  button,  action,  mods)->
+        {
+            if (!hm.containsKey("cast")&&button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+                System.out.println("M1-Pressed");
+
+                mW.castDown.anim=0;
+                mW.castUp.anim=0;
+                mW.castLeft.anim=0;
+                mW.castRight.anim=0;
+
+                hm.put("cast",1);
+                casted=true;
+
+
+
+               //updateMW();
+            }
+
+            if (!hm.containsKey("attack")&&button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+                System.out.println("M2-Pressed");
+
+                mW.attackDown.anim=0;
+                mW.attackUp.anim=0;
+                mW.attackLeft.anim=0;
+                mW.attackRight.anim=0;
+
+                hm.put("attack",1);
+
+                mW.spawnProjectiles(previousAnimstate);
+
+                //updateMW();
+            }
+
+        });
+
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
             //controler.stop();
 
@@ -60,6 +98,16 @@ public class Control {
                 hm.put("movement_UP",1);
                 //System.out.println("UP pressed");
             }
+
+            if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE) {
+                hm.remove("sprint");
+                //System.out.println("IP released");
+            }
+            if (!hm.containsKey("sprint")&&key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS) {
+                hm.put("sprint",125);
+                //System.out.println("UP pressed");
+            }
+
             if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
                 hm.remove("movement_DOWN");
                 //System.out.println("IP released");
@@ -95,26 +143,67 @@ public class Control {
 
     }
 
+
+    public void removeAnime(String state){hm.remove(state);}
+
     public void updateMW() {
 
         mW.animationState=0;
+        //if(mW.castDown.finished){try{removeAnime("cast");}catch (Exception e){};mW.castDown.finished=false;}
 
-        //System.out.println(hm.containsKey("updated movement"));
-        if(hm.containsKey("movement_UP")){
-            mW.setCameraY(-5);
-            mW.animationState=1;
+        if(hm.containsKey("cast")){
+
+        switch (previousAnimstate){
+            case 1:mW.animationState=5;break;
+            case 2:mW.animationState=6;break;
+            case 3:mW.animationState=7;break;
+            case 4:mW.animationState=8;break;
+            default:mW.animationState=6;break;
+
         }
-        else if(hm.containsKey("movement_DOWN")){
-            mW.setCameraY(5);
-            mW.animationState=2;
+
         }
-        else if(hm.containsKey("movement_LEFT")){
-            mW.setCamerX(-5);
-            mW.animationState=3;
+        else if(hm.containsKey("attack")){
+            switch (previousAnimstate){
+                case 1:mW.animationState=9;break;
+                case 2:mW.animationState=10;break;
+                case 3:mW.animationState=11;break;
+                case 4:mW.animationState=12;break;
+                default:mW.animationState=10;break;
+
+            }
+
         }
-        else if(hm.containsKey("movement_RIGHT")){
-            mW.setCamerX(5);
-            mW.animationState=4;
+        else {
+
+            //System.out.println(hm.containsKey("updated movement"));
+            if (hm.containsKey("movement_UP")) {
+                mW.setCameraY(-5 * speed);
+                mW.animationState = 1;
+                previousAnimstate=1;
+            } else if (hm.containsKey("movement_DOWN")) {
+                mW.setCameraY(5 * speed);
+                mW.animationState = 2;
+                previousAnimstate=2;
+            } else if (hm.containsKey("movement_LEFT")) {
+                mW.setCamerX(-5 * speed);
+                mW.animationState = 3;
+                previousAnimstate=3;
+            } else if (hm.containsKey("movement_RIGHT")) {
+                mW.setCamerX(5 * speed);
+                mW.animationState = 4;
+                previousAnimstate=4;
+            }
+
+            if (hm.containsKey("sprint")) {
+                SpriteAnimation.setSpeed((int) hm.get("sprint"));
+                speed = 2;
+            } else {
+                SpriteAnimation.resetSpeed();
+                speed = 1;
+            }
+
+
         }
 
     }

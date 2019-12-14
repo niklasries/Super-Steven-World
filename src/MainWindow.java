@@ -72,12 +72,21 @@ public class MainWindow {
     public int viewareaX=0;
     public int viewareaY=0;
 
+    int charSize=150;
+
     Thread cam;
 
     public Texture text;
     public Texture text2;
     public TextureAtlas text1;
+    public TextureAtlas textureAtlas;
+
+    public TextureAtlas textureAtlas1;
     public int testcount;
+
+
+
+
 
     public int animationState=0;
 
@@ -85,6 +94,23 @@ public class MainWindow {
     public SpriteAnimation walkLeft;
     public SpriteAnimation walkRight;
     public SpriteAnimation walkUp;
+
+    public SpriteAnimation castDown;
+    public SpriteAnimation castLeft;
+    public SpriteAnimation castRight;
+    public SpriteAnimation castUp;
+
+    public SpriteAnimation attackDown;
+    public SpriteAnimation attackLeft;
+    public SpriteAnimation attackRight;
+    public SpriteAnimation attackUp;
+    MainWindow mw;
+
+    ArrayList<Projectile> projectiles=new ArrayList<Projectile>();
+    ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+
+    ArrayList<Enemy> unModenemies;
+
 
 
     //controll agen
@@ -99,6 +125,8 @@ public class MainWindow {
 
     //main game loop executed in run()
     public void run() {
+
+        mw=this;
 
         startTime = System.currentTimeMillis() / 1000.0;
 
@@ -121,7 +149,10 @@ public class MainWindow {
     }
         private void init(){
 
-        //setup error callback
+
+
+
+            //setup error callback
         // print all errors in glfw in system.err
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -190,6 +221,9 @@ public class MainWindow {
 
             });;
 
+
+
+
             //get the thread stack and push a new frame
             try (MemoryStack stack = stackPush()) {
                 IntBuffer pWidth = stack.mallocInt(1);
@@ -229,12 +263,45 @@ public class MainWindow {
 
         }
 
+
+
     public void setCamerX(float camerX) {
         this.camerX += camerX;
     }
 
     public void setCameraY(float cameraY) {
         this.cameraY += cameraY;
+    }
+
+    public void spawnProjectiles(int previousAnimstate){
+
+        Vec2D pDir;
+        switch (previousAnimstate){
+            case 1:pDir=new Vec2D(0,-1);break;
+            case 2:pDir=new Vec2D(0,1);break;
+            case 3:pDir=new Vec2D(-1,0);break;
+            case 4:pDir=new Vec2D(1,0);break;
+            default:pDir=new Vec2D(0,1);
+        }
+        
+        projectiles.add(new Projectile(30,textureAtlas.getSubtexture(0),pDir,new Vec2D(camerX+charSize/2,cameraY+charSize/2),15));
+        
+    }
+
+    public void castProjectiles(int previousAnimstate){
+
+        Vec2D pDir;
+        switch (previousAnimstate){
+            case 1:pDir=new Vec2D(0,-1);break;
+            case 2:pDir=new Vec2D(0,1);break;
+            case 3:pDir=new Vec2D(-1,0);break;
+            case 4:pDir=new Vec2D(1,0);break;
+            default:pDir=new Vec2D(0,1);
+        }
+
+        projectiles.add(new Projectile(60,textureAtlas.getSubtexture(1),pDir,new Vec2D(camerX+charSize/3,cameraY+charSize/2),1));
+
+
     }
 
     private void loop(){
@@ -245,7 +312,10 @@ public class MainWindow {
                 int count1=0;
                 try {
                     //text=new Texture(new URL("https://raw.githubusercontent.com/wiki/mattdesl/lwjgl-basics/images/IGn1g.png"));
-                    text1=new TextureAtlas(getClass().getClassLoader().getResourceAsStream("files/testanimation.png"),66,66);
+                    text1=new TextureAtlas(getClass().getClassLoader().getResourceAsStream("files/stevenSpritesheet.png"),64,64);
+                    textureAtlas=new TextureAtlas(getClass().getClassLoader().getResourceAsStream("files/projectiles.png"),64,64);
+                    textureAtlas1=new TextureAtlas(getClass().getClassLoader().getResourceAsStream("files/testanimation.png"),66,66);
+
                     text=new Texture(getClass().getClassLoader().getResourceAsStream("files/steven1.png"));
                     text2=new Texture(getClass().getClassLoader().getResourceAsStream("files/chessSet1.png"));
 
@@ -257,14 +327,33 @@ public class MainWindow {
                 testcount=text1.getCount();
 
 
-        walkDown=new SpriteAnimation(text1.getSpriteArray(0,3),true);
+        walkDown=new SpriteAnimation(text1.getSpriteArray(13*10,13*10+7),true,1);
         walkDown.start();
-        walkLeft=new SpriteAnimation(text1.getSpriteArray(4,7),true);
+        walkLeft=new SpriteAnimation(text1.getSpriteArray(13*9,13*9+7),true,1);
         walkLeft.start();
-        walkRight=new SpriteAnimation(text1.getSpriteArray(8,11),true);
+        walkRight=new SpriteAnimation(text1.getSpriteArray(13*11,13*11+7),true,1);
         walkRight.start();
-        walkUp=new SpriteAnimation(text1.getSpriteArray(12,15),true);
+        walkUp=new SpriteAnimation(text1.getSpriteArray(13*8,13*8+7),true,1);
         walkUp.start();
+
+        castDown=new SpriteAnimation(text1.getSpriteArray(13*2,13*2+6),false,2);
+        castDown.start();
+        castLeft=new SpriteAnimation(text1.getSpriteArray(13*1,13*1+6),false,2);
+        castLeft.start();
+        castRight=new SpriteAnimation(text1.getSpriteArray(13*3,13*3+6),false,2);
+        castRight.start();
+        castUp=new SpriteAnimation(text1.getSpriteArray(13*0,13*0+6),false,2);
+        castUp.start();
+
+        attackDown=new SpriteAnimation(text1.getSpriteArray(13*14,13*14+5),false,3);
+        attackDown.start();
+        attackLeft=new SpriteAnimation(text1.getSpriteArray(13*13,13*13+5),false,3);
+        attackLeft.start();
+        attackRight=new SpriteAnimation(text1.getSpriteArray(13*15,13*15+5),false,3);
+        attackRight.start();
+        attackUp=new SpriteAnimation(text1.getSpriteArray(13*12,13*12+5),false,3);
+        attackUp.start();
+
 
 
                 //hide cursor
@@ -293,20 +382,28 @@ public class MainWindow {
                         System.out.println("collided in -x direction");
                         translate(viewareaX=-5,viewareaY,0);setCamerX(5);
                     }else{translate(viewareaX,viewareaY,0);}*/
-                    if(camerX+150>=bbposx+300){
-                        //System.out.println("collided in x direction");
-                        translate(viewareaX+=5,viewareaY,0);setCamerX(-5);}else{translate(viewareaX,viewareaY,0);}
+                    if(camerX+charSize/2>=bbposx+300){
+                        //System.out.println("collided in +x direction");
+                        translate(viewareaX+=5*Control.speed,viewareaY,0);setCamerX(-5*Control.speed);
+                        Enemy.offsetX=5*Control.speed;
+                    }else{translate(viewareaX,viewareaY,0);Enemy.offsetX=0;}
 
-                    if(camerX+150<=bbposx-300){
-                        //System.out.println("collided in x direction");
-                        translate(viewareaX-=5,viewareaY,0);setCamerX(5);}else{translate(viewareaX,viewareaY,0);}
+                    if(camerX+charSize/2<=bbposx-300){
+                        //System.out.println("collided in -x direction");
+                        translate(viewareaX-=5*Control.speed,viewareaY,0);setCamerX(5*Control.speed);
+                        Enemy.offsetX=5*Control.speed;
+                    }else{translate(viewareaX,viewareaY,0);Enemy.offsetX=0;}
 
-                    if(cameraY+150<=bbposy-150){
+                    if(cameraY+charSize/2<=bbposy-150){
                         //System.out.println("collided in y direction");
-                    translate(viewareaX,viewareaY-=5,0);setCameraY(5);}else{translate(viewareaX,viewareaY,0);}
-                    if(cameraY+150>=bbposy+150){
+                    translate(viewareaX,viewareaY-=5*Control.speed,0);setCameraY(5*Control.speed);
+                        Enemy.offsetY=5*Control.speed;
+                    }else{translate(viewareaX,viewareaY,0);Enemy.offsetY=0;}
+                    if(cameraY+charSize/2>=bbposy+150){
                         //System.out.println("collided in -y direction");
-                    translate(viewareaX,viewareaY+=5,0);setCameraY(-5);}else{translate(viewareaX,viewareaY,0);}
+                    translate(viewareaX,viewareaY+=5*Control.speed,0);setCameraY(-5*Control.speed);
+                        Enemy.offsetY=5*Control.speed;
+                    }else{translate(viewareaX,viewareaY,0);Enemy.offsetY=0;}
 
                     try {
                         Thread.sleep(16);                   } catch (InterruptedException e) {
@@ -320,6 +417,81 @@ public class MainWindow {
 
 
 cam.start();
+
+
+
+
+
+
+        Thread enemiees = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createEnemies();
+                for (Enemy e:enemies
+                ) {e.start();
+
+                }
+                while(!glfwWindowShouldClose(window)) {
+
+                    try {
+                        for (Enemy e : collisionProjectiles()
+                        ) {
+                            try {
+
+                                enemies.remove(e);
+                            } catch (Exception b) {
+                            }
+
+                        }
+                        if (enemies.isEmpty()) {
+                            createEnemies();
+                            for (Enemy e : enemies
+                            ) {
+                                e.start();
+
+                            }
+                        }
+
+                    }catch(Exception kp){}
+                }
+
+            }
+
+            private void createEnemies() {
+                for (int i = 0; i < 20000; i++) {
+                    enemies.add(new Enemy(100,text1.getSubtexture(0),new Vec2D(0,0),new Vec2D((float)(Math.random()*1200*10),(float)(Math.random()*1200*10)),10,mw));
+
+                }
+            }
+
+
+            private ArrayList<Enemy> collisionProjectiles() {
+                ArrayList<Enemy>remove=new ArrayList<Enemy>();
+                for (Projectile p: projectiles
+                ) {
+
+                    for (Enemy e:enemies
+                    ) {
+
+
+                        if (p.currPos.x < e.currPos.x + e.size &&
+                                p.currPos.x + p.size > e.currPos.x &&
+                                p.currPos.y < e.currPos.y + e.size &&
+                                p.currPos.y + p.size > e.currPos.y) {
+
+                            // collision detected!
+
+                            //System.out.println("collided");
+                            e.kill();
+                            remove.add(e);
+                        }
+                    }
+
+                }
+                return remove;
+            }
+        });
+enemiees.start();
         //while the window existent ent esc not pressed render
                 while(!glfwWindowShouldClose(window)){
 
@@ -358,6 +530,10 @@ cam.start();
                    //glLoadIdentity();
 
 
+                    //
+
+
+
                     //todo draw stuff here
 
 
@@ -371,8 +547,13 @@ cam.start();
 
 
                         //System.out.println(camerX+" | "+cameraY);
-                        textureAtlasTest(text1, camerX, cameraY, 300, 300);
+                        textureAtlasTest(text1, camerX, cameraY, charSize, charSize);
                         textureTest(text,(float)curserX,(float)curserY, 100, 100);
+                        
+                        drawSubtextures(projectiles,textureAtlas);
+
+                        unModenemies=(ArrayList<Enemy>)enemies.clone();
+                        drawSubtextures(unModenemies,textureAtlas1,1);
 
 
                         count++;
@@ -402,7 +583,10 @@ cam.start();
                 System.gc();
 
             }
-            public void translate(float x, float y, float z){
+
+
+
+    public void translate(float x, float y, float z){
              viewareaX=(int)x;
              viewareaY=(int)y;
              //float diff=camerX-viewareaX;
@@ -410,6 +594,7 @@ cam.start();
 
 
             }
+            
 
     private  void textureTest(Texture tex,float x,float y,float width,float height){
 
@@ -457,6 +642,162 @@ cam.start();
 
     }
 
+    private  void drawSubtextures(ArrayList<Enemy> enemy,TextureAtlas tex, int kp){
+
+        glTranslatef(0, 0, 0);
+        glMatrixMode(GL_PROJECTION);
+
+
+        glEnable(GL_TEXTURE_2D);
+
+        tex.bind();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+        try{
+        for (Enemy e:enemy) {
+
+            if(e.shouldclose){}
+
+
+
+            else{
+                Subtexture sText = e.texture;
+                float srcX = sText.x;
+                float srcY = sText.y;
+                float srcWidth = sText.width;
+                float srcHeight = sText.height;
+
+                float u = srcX / tex.width;
+                float v = srcY / tex.height;
+                float u2 = (srcX + srcWidth) / tex.width;
+                float v2 = (srcY + srcHeight) / tex.height;
+
+
+                float x = e.currPos.x;
+                float y = e.currPos.y;
+                float height = e.size;
+                float width = e.size;
+                //tegacy drawing for testing only
+                glColor4f(1f, 1f, 1f, 1f);
+                glBegin(GL_QUADS);
+                glTexCoord2f(u, v);
+                glVertex2f(x, y);
+                glTexCoord2f(u, v2);
+                glVertex2f(x, y + height);
+                glTexCoord2f(u2, v2);
+                glVertex2f(x + width, y + height);
+                glTexCoord2f(u2, v);
+                glVertex2f(x + width, y);
+                glEnd();
+
+
+            }
+        }
+        }catch(Exception kp1){}
+
+
+
+        //System.out.println(animation);
+
+
+
+        glDisable(GL_BLEND);
+
+
+    }
+
+    private  void drawSubtextures(ArrayList<Projectile> proj,TextureAtlas tex){
+
+        glTranslatef(0, 0, 0);
+        glMatrixMode(GL_PROJECTION);
+
+            /*glLoadIdentity();
+            updateWindowSize();
+                glViewport(0, 0, sceneW, sceneH);
+                glOrtho(0,sceneW,sceneH,0,-1,1);*/
+
+        glEnable(GL_TEXTURE_2D);
+
+        tex.bind();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+        //definde the u-v-coordinates for the texture like x-y to the size specified
+               /* float u =0f;
+                float v =0f;
+                float u2 =1f;
+                float v2 =1f;
+
+
+
+*/
+
+
+            ArrayList<Projectile> remove=new ArrayList<Projectile>();
+        for (Projectile p:proj) {
+
+
+            //System.out.println(p.currPos.x+" | "+p.currPos.y);
+            //System.out.println(p.startPos.x+" | "+p.startPos.y);
+
+            if(Math.abs(p.currPos.x-p.startPos.x)>600||Math.abs(p.currPos.y-p.startPos.y)>600){remove.add(p);
+            }
+
+
+            {
+                Subtexture sText = p.texture;
+                float srcX = sText.x;
+                float srcY = sText.y;
+                float srcWidth = sText.width;
+                float srcHeight = sText.height;
+
+                float u = srcX / tex.width;
+                float v = srcY / tex.height;
+                float u2 = (srcX + srcWidth) / tex.width;
+                float v2 = (srcY + srcHeight) / tex.height;
+
+
+                float x = p.currPos.x;
+                float y = p.currPos.y;
+                float height = p.size;
+                float width = p.size;
+                //tegacy drawing for testing only
+                glColor4f(1f, 1f, 1f, 1f);
+                glBegin(GL_QUADS);
+                glTexCoord2f(u, v);
+                glVertex2f(x, y);
+                glTexCoord2f(u, v2);
+                glVertex2f(x, y + height);
+                glTexCoord2f(u2, v2);
+                glVertex2f(x + width, y + height);
+                glTexCoord2f(u2, v);
+                glVertex2f(x + width, y);
+                glEnd();
+
+                p.currPos.x += p.dir.x * p.speed;
+                p.currPos.y += p.dir.y * p.speed;
+            }
+
+        }
+
+        //System.out.println(animation);
+
+
+
+        glDisable(GL_BLEND);
+
+        for (Projectile p:remove) {
+            proj.remove(p);
+
+        }
+
+    }
+
             private  void textureAtlasTest(TextureAtlas tex,float x,float y,float width,float height){
 
             glMatrixMode(GL_PROJECTION);
@@ -483,17 +824,49 @@ cam.start();
 
 */
 
-
-
-
-
                Subtexture sText;
+
+                resetCastAnim();
+                resetAttackAnim();
                 switch (animationState){
                     case 1: sText= walkUp.getFrame();break;
                     case 2: sText= walkDown.getFrame();break;
                     case 3: sText= walkLeft.getFrame();break;
                     case 4: sText= walkRight.getFrame();break;
-                    default:sText=walkDown.getFrame(0);
+
+
+                    case 5: sText=castUp.getFrame();if(castUp.anim==castUp.frames-2){if(c1.casted){castProjectiles(1);
+                        castProjectiles(2);
+                        castProjectiles(3);
+                        castProjectiles(4);
+                        c1.casted=false;}}break;
+                    case 6: sText=castDown.getFrame();if(castDown.anim==castDown.frames-2){if(c1.casted){castProjectiles(1);
+                        castProjectiles(2);
+                        castProjectiles(3);
+                        castProjectiles(4);
+                        c1.casted=false;}}break;
+                    case 7: sText=castLeft.getFrame();if(castLeft.anim==castLeft.frames-2){if(c1.casted){castProjectiles(1);
+                        castProjectiles(2);
+                        castProjectiles(3);
+                        castProjectiles(4);
+                        c1.casted=false;}}break;
+                    case 8: sText=castRight.getFrame();if(castRight.anim==castRight.frames-2){if(c1.casted){castProjectiles(1);
+                        castProjectiles(2);
+                        castProjectiles(3);
+                        castProjectiles(4);
+                        c1.casted=false;}}break;
+
+
+                    case 9:sText=attackUp.getFrame();break;
+                    case 10:sText=attackDown.getFrame();break;
+                    case 11:sText=attackLeft.getFrame();break;
+                    case 12:sText=attackRight.getFrame();break;
+                    default:switch (c1.previousAnimstate){
+                    case 1:sText=walkUp.getFrame(0);break;
+                    case 2:sText=walkDown.getFrame(0);break;
+                    case 3:sText=walkLeft.getFrame(0);break;
+                    case 4:sText=walkRight.getFrame(0);break;
+                        default: sText=walkDown.getFrame(0);break;}
                 }
 
                //System.out.println(animation);
@@ -527,7 +900,30 @@ cam.start();
 
             }
 
-            private void drawTest(){
+    private void resetCastAnim() {
+        boolean cast=false;
+        if(castUp.finished){c1.removeAnime("cast");castUp.finished=false;cast=true;}
+
+        if(castDown.finished){c1.removeAnime("cast");castDown.finished=false;cast=true;}
+
+        if(castLeft.finished){c1.removeAnime("cast");castLeft.finished=false;cast=true;}
+
+        if(castRight.finished){c1.removeAnime("cast");castRight.finished=false;cast=true;}
+
+    }
+
+    private void resetAttackAnim() {
+        if(attackUp.finished){c1.removeAnime("attack");attackUp.finished=false;}
+
+        if(attackDown.finished){c1.removeAnime("attack");attackDown.finished=false;}
+
+        if(attackLeft.finished){c1.removeAnime("attack");attackLeft.finished=false;}
+
+        if(attackRight.finished){c1.removeAnime("attack");attackRight.finished=false;}
+    }
+
+
+    private void drawTest(){
 
 
 

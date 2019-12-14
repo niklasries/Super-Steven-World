@@ -38,7 +38,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
@@ -96,6 +96,10 @@
       <workItem from="1575017688716" duration="3447000" />
       <workItem from="1575021483364" duration="24365000" />
       <workItem from="1575884472678" duration="1693000" />
+      <workItem from="1576147680987" duration="11424000" />
+      <workItem from="1576279713576" duration="8648000" />
+      <workItem from="1576288652826" duration="902000" />
+      <workItem from="1576290616006" duration="8592000" />
     </task>
     <servers />
   </component>
